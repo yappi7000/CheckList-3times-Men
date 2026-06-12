@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3回で終わる男・続く男タイプ診断</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #121212;
+    color: #f0f0f0;
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    padding: 24px 16px;
+  }
+  .card {
+    max-width: 480px;
+    width:100%;
+    background: #1c1c1c;
+    border: 1px solid #2e2a20;
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  h1 {
+    font-size: 1.3rem;
+    color: #d4af37;
+    text-align:center;
+    margin-bottom: 6px;
+    line-height:1.5;
+  }
+  .sub {
+    text-align:center;
+    color:#999;
+    font-family:'DM Mono', monospace;
+    font-size:0.75rem;
+    letter-spacing:0.05em;
+    margin-bottom: 24px;
+  }
+  .progress {
+    height: 4px;
+    background:#333;
+    border-radius:4px;
+    margin-bottom: 28px;
+    overflow:hidden;
+  }
+  .progress-bar {
+    height:100%;
+    background: linear-gradient(90deg,#d4af37,#f5e6a8);
+    transition: width 0.3s ease;
+    width:0%;
+  }
+  .question { display:none; }
+  .question.active { display:block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .qnum {
+    font-family:'DM Mono', monospace;
+    color:#d4af37;
+    font-size:0.8rem;
+    margin-bottom: 8px;
+  }
+  .qtext {
+    font-size:1.05rem;
+    font-weight:700;
+    margin-bottom: 20px;
+    line-height:1.6;
+  }
+  .options { display:flex; flex-direction:column; gap:10px; }
+  .option {
+    background:#252525;
+    border:1px solid #3a3a3a;
+    border-radius:10px;
+    padding:14px 16px;
+    font-size:0.92rem;
+    cursor:pointer;
+    transition: all 0.2s ease;
+    line-height:1.5;
+  }
+  .option:hover { border-color:#d4af37; background:#2a2620; }
+  .option:active { transform: scale(0.98); }
+
+  .result { display:none; text-align:center; }
+  .result.active { display:block; animation: fadeIn 0.5s ease; }
+  .result-badge {
+    display:inline-block;
+    font-family:'DM Mono', monospace;
+    font-size:0.75rem;
+    color:#121212;
+    background:#d4af37;
+    padding:4px 14px;
+    border-radius:20px;
+    margin-bottom:14px;
+    letter-spacing:0.05em;
+  }
+  .result-title {
+    font-size:1.5rem;
+    color:#f5e6a8;
+    margin-bottom: 14px;
+    line-height:1.5;
+    font-weight:700;
+  }
+  .result-desc {
+    font-size:0.92rem;
+    color:#ccc;
+    line-height:1.9;
+    text-align:left;
+    margin-bottom: 24px;
+  }
+  .result-desc strong { color:#f5e6a8; }
+
+  .callout {
+    background: linear-gradient(135deg, #2a2620, #1c1c1c);
+    border:1px solid #d4af37;
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:20px;
+  }
+  .callout-title {
+    font-size:1rem;
+    font-weight:700;
+    color:#f5e6a8;
+    margin-bottom:8px;
+  }
+  .callout-text {
+    font-size:0.85rem;
+    color:#ccc;
+    line-height:1.8;
+    margin-bottom:16px;
+  }
+  .line-btn {
+    display:block;
+    width:100%;
+    text-align:center;
+    background: linear-gradient(135deg, #d4af37, #f5e6a8);
+    color:#121212;
+    font-weight:700;
+    font-size:1rem;
+    padding:16px;
+    border-radius:10px;
+    text-decoration:none;
+    transition: opacity 0.2s ease;
+  }
+  .line-btn:hover { opacity:0.85; }
+  .line-note {
+    font-family:'DM Mono', monospace;
+    font-size:0.7rem;
+    color:#888;
+    text-align:center;
+    margin-top:10px;
+  }
+  .restart {
+    display:block;
+    text-align:center;
+    margin-top:18px;
+    color:#888;
+    font-size:0.8rem;
+    cursor:pointer;
+    text-decoration:underline;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>あなたは「3回で終わる男」？<br>それとも「続く男」？</h1>
+  <div class="sub">60秒・全5問でわかる大人の恋愛タイプ診断</div>
+
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+  <!-- Q1 -->
+  <div class="question active" data-q="1">
+    <div class="qnum">Q1 / 5</div>
+    <div class="qtext">気になる女性とLINEを始めた。最初のメッセージで意識するのは？</div>
+    <div class="options">
+      <div class="option" data-score="0">とにかく早く会いたい気持ちを伝える</div>
+      <div class="option" data-score="2">相手が返信しやすい、軽い質問を送る</div>
+      <div class="option" data-score="1">面白いと思われたくて長文を送る</div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question" data-q="2">
+    <div class="qnum">Q2 / 5</div>
+    <div class="qtext">初デート。お店選びで重視するのは？</div>
+    <div class="options">
+      <div class="option" data-score="2">相手がリラックスできる雰囲気の店</div>
+      <div class="option" data-score="0">自分が行きたい・好きな店</div>
+      <div class="option" data-score="1">とりあえずネットで評価が高い店</div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question" data-q="3">
+    <div class="qnum">Q3 / 5</div>
+    <div class="qtext">2回目のデートの後、相手からの返信が少し遅くなった。あなたは？</div>
+    <div class="options">
+      <div class="option" data-score="0">何度もLINEを送って様子を確認する</div>
+      <div class="option" data-score="2">特に気にせず、自分の生活を続ける</div>
+      <div class="option" data-score="1">「何かあった？」と一度だけ聞く</div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question" data-q="4">
+    <div class="qnum">Q4 / 5</div>
+    <div class="qtext">会話の中で、相手が自分の話をたくさんしてくれた。あなたの反応は？</div>
+    <div class="options">
+      <div class="option" data-score="2">相づちを打ちながら、聞き役に回る</div>
+      <div class="option" data-score="0">自分の話に切り替えて、共感を求める</div>
+      <div class="option" data-score="1">アドバイスや解決策を提案したくなる</div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question" data-q="5">
+    <div class="qnum">Q5 / 5</div>
+    <div class="qtext">3回目のデートが終わった。次に繋がるかどうかの分かれ目は何だと思う？</div>
+    <div class="options">
+      <div class="option" data-score="0">自分がどれだけ好意を伝えられたか</div>
+      <div class="option" data-score="2">相手が「また会いたい」と思える余白を残せたか</div>
+      <div class="option" data-score="1">会話の盛り上がり方</div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="result" data-result="A">
+    <div class="result-badge">TYPE A</div>
+    <div class="result-title">完全に「3回で終わる男」タイプ</div>
+    <div class="result-desc">
+      あなたは<strong>「好意をすぐ伝えたい」「不安をすぐ解消したい」</strong>という気持ちが強いタイプ。<br><br>
+      これは決して悪いことではありませんが、大人の女性は<strong>"急かされる"ことに無意識に距離を置きます</strong>。本人に悪気はないのに、3回目あたりで連絡が静かに減っていく…これがまさにそのパターンです。<br><br>
+      でも安心してください。これは「相手への興味の持ち方」と「ペースの作り方」を少し変えるだけで、驚くほど改善します。
+    </div>
+  </div>
+
+  <div class="result" data-result="B">
+    <div class="result-badge">TYPE B</div>
+    <div class="result-title">「惜しい男」タイプ・伸びしろ大</div>
+    <div class="result-desc">
+      あなたは基本的なバランスは取れているものの、<strong>場面によって「自分本位」が出てしまう</strong>タイプ。<br><br>
+      特に「会話の主導権」「連絡のペース」のどちらかで、無意識に相手のテンポを乱している可能性があります。<br><br>
+      ここを整えるだけで、<strong>「続く男」まで一気に近づきます。</strong>あと一歩です。
+    </div>
+  </div>
+
+  <div class="result" data-result="C">
+    <div class="result-badge">TYPE C</div>
+    <div class="result-title">「続く男」の素質を持つタイプ</div>
+    <div class="result-desc">
+      あなたはすでに<strong>「相手のペースを大切にする」「余白を残す」</strong>という、大人の関係を続けるための土台ができています。<br><br>
+      ただし、油断は禁物。せっかくの土台があっても、<strong>ある"小さな一言"や"タイミングのズレ"</strong>で関係が静かに終わってしまうケースは、続く男タイプにこそ多いんです。<br><br>
+      その最後のピースを埋めることで、あなたの恋愛は一段上のステージに進みます。
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">📩 診断結果をもっと詳しく</div>
+    <div class="callout-text">
+      あなたのタイプ別「3回目の壁」を越えるための具体的な対処法と、<strong>大人の女性が"また会いたい"と思う瞬間チェックリスト</strong>を、公式LINEで無料配布中です。
+    </div>
+    <a class="line-btn" href="https://lin.ee/RyRnspx" target="_blank">無料でLINE登録して受け取る</a>
+    <div class="line-note">※登録は1分以内に完了します</div>
+  </div>
+
+  <div class="restart" onclick="restart()">もう一度診断する</div>
+</div>
+
+<script>
+  let currentQ = 1;
+  let totalScore = 0;
+  const totalQuestions = 5;
+
+  document.querySelectorAll('.question').forEach(q => {
+    q.querySelectorAll('.option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        totalScore += parseInt(opt.dataset.score);
+        nextQuestion();
+      });
+    });
+  });
+
+  function nextQuestion() {
+    const current = document.querySelector(`.question[data-q="${currentQ}"]`);
+    current.classList.remove('active');
+    currentQ++;
+
+    updateProgress();
+
+    if (currentQ <= totalQuestions) {
+      document.querySelector(`.question[data-q="${currentQ}"]`).classList.add('active');
+    } else {
+      showResult();
+    }
+  }
+
+  function updateProgress() {
+    const pct = Math.min(((currentQ-1) / totalQuestions) * 100, 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  function showResult() {
+    document.getElementById('progressBar').style.width = '100%';
+    let type;
+    if (totalScore <= 3) type = 'A';
+    else if (totalScore <= 7) type = 'B';
+    else type = 'C';
+
+    document.querySelector(`.result[data-result="${type}"]`).classList.add('active');
+  }
+
+  function restart() {
+    document.querySelectorAll('.result').forEach(r => r.classList.remove('active'));
+    document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+    currentQ = 1;
+    totalScore = 0;
+    document.querySelector('.question[data-q="1"]').classList.add('active');
+    document.getElementById('progressBar').style.width = '0%';
+  }
+</script>
+</body>
+</html>
